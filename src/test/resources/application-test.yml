@@ -1,0 +1,11 @@
+application:
+  keycloak:
+    version: 25.0.2
+    admin:
+      username: admin
+      password: admin@123
+    realm:
+      name: customer
+      client:
+        id: "department"
+        secret: "**********"

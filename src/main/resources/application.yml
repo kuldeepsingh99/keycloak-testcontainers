@@ -1,0 +1,15 @@
+spring:
+  application:
+    name: keycloak-test-container
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8080/realms/customer
+
+
+application:
+  client: "department"
+
+server:
+  port: 8082
