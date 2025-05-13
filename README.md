@@ -39,9 +39,9 @@ This repository demonstrates how to perform integration testing in a Spring Boot
 
 - How to simulate real-world authentication in tests without mocking
 
-### Explanatation of the code
+## Explanatation of the code
 
-Here we have one Controller where one endpoint is secured
+Here we have one Controller where endpoints are secured
 
 ```
 @RestController
@@ -121,6 +121,24 @@ public class KeycloakContainerInitializer implements ApplicationContextInitializ
 - we are setting the isser uri dynamically
 - we are exposing the KeycloakContainer to be used in other classes
 - we are importing a realm with a client, please check this [file](https://github.com/kuldeepsingh99/keycloak-testcontainers/blob/main/src/test/resources/realm/customer-realm.json)
+
+### 🚀 Property file
+
+In the test yml file most of the things are configurable
+
+```
+application:
+  keycloak:
+    version: 25.0.2
+    admin:
+      username: admin
+      password: admin@123
+    realm:
+      name: customer
+      client:
+        id: "department"
+        secret: "**********"
+```
 
 ### 🚀 Realm and Client Import JSON
 
