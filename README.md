@@ -122,7 +122,7 @@ public class KeycloakContainerInitializer implements ApplicationContextInitializ
 - we are exposing the KeycloakContainer to be used in other classes
 - we are importing a realm with a client, please check this [file](https://github.com/kuldeepsingh99/keycloak-testcontainers/blob/main/src/test/resources/realm/customer-realm.json)
 
-### 🚀 Real and Client Import JSON
+### 🚀 Realm and Client Import JSON
 
 This a file where we have realm and client details, Please check this [customer-realm.json](https://github.com/kuldeepsingh99/keycloak-testcontainers/blob/main/src/test/resources/realm/customer-realm.json)
 
@@ -139,6 +139,8 @@ docker run -p 8080:8080 -e KC_BOOTSTRAP_ADMIN_USERNAME=admin -e KC_BOOTSTRAP_ADM
 ### 🚀 Keycloak Utility class
 
 Check this [KeycloakTestUtils](https://github.com/kuldeepsingh99/keycloak-testcontainers/blob/main/src/test/java/com/portal/keycloak/KeycloakTestUtils.java) where i have created few utility methods like **createAccessToken**, **createUser**, **createGroup**, **createClientRole**, **getClientByName**.
+
+One more point to note here is that to perform any admin operation we need a Access Token, so we are generating the master realm access token, please check `keycloakClient` method
 
 As per our requirement we can create methods and play 💥 with keycloak 
 
@@ -189,7 +191,28 @@ As per our requirement we can create methods and play 💥 with keycloak
     }
 ```
 
-### Final Test Class
+### 🚀 Final Test Class
+
+We have only one test where we generate Client-credentials access token and execute the REST Endpoint with valid access token
+
+```
+@Test
+void testProtectedEndpoint() {
+
+    String accessToken = keycloakTestUtils.getAccessToken(
+            keycloakProperties.getRealm().getClient().getId(),
+            keycloakProperties.getRealm().getClient().getSecret());
+
+    HttpHeaders headers = new HttpHeaders();
+    headers.setBearerAuth(accessToken);
+    HttpEntity<String> entity = new HttpEntity<>(headers);
+
+    ResponseEntity<String> response = restTemplate.exchange("/api/v2/products", HttpMethod.GET, entity, String.class);
+    assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+    assertThat(response.getBody()).isEqualTo("Hello Products");
+
+}
+```
 
 
 
