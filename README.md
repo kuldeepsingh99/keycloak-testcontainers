@@ -19,7 +19,7 @@ Keycloak Testcontainer is a great tool for performing integration tests involvin
  
 
 This repository demonstrates how to perform integration testing in a Spring Boot application that uses Keycloak for authentication, by leveraging Keycloak Testcontainers.
-----
+---
 
 ✅ Features:
 - Spring Boot application with secured endpoints
@@ -140,6 +140,13 @@ application:
         secret: "**********"
 ```
 
+### 🚀 build.grade file
+
+```
+testImplementation 'com.github.dasniko:testcontainers-keycloak:3.7.0'
+```
+This is the important dependency that is required for keycloak testcontaines
+
 ### 🚀 Realm and Client Import JSON
 
 This a file where we have realm and client details, Please check this [customer-realm.json](https://github.com/kuldeepsingh99/keycloak-testcontainers/blob/main/src/test/resources/realm/customer-realm.json)
@@ -158,60 +165,60 @@ docker run -p 8080:8080 -e KC_BOOTSTRAP_ADMIN_USERNAME=admin -e KC_BOOTSTRAP_ADM
 
 Check this [KeycloakTestUtils](https://github.com/kuldeepsingh99/keycloak-testcontainers/blob/main/src/test/java/com/portal/keycloak/KeycloakTestUtils.java) where i have created few utility methods like **createAccessToken**, **createUser**, **createGroup**, **createClientRole**, **getClientByName**.
 
-One more point to note here is that to perform any admin operation we need a Access Token, so we are generating the master realm access token, please check `keycloakClient` method
+One more point to note here is that to perform any admin operation we need a Access Token, so we are generating the **master** realm access token, please check `keycloakClient` method
 
-As per our requirement we can create methods and play 💥 with keycloak 
+As per your requirement you can create methods and play 💥 with keycloak 
 
 ```
 /**
-     * Get access token using client credentials
-     * @param clientId Client ID
-     * @param clientSecret Client Secret
-     * @return Access token
-     */
-    public String getAccessToken(String clientId, String clientSecret) {
+   * Get access token using client credentials
+   * @param clientId Client ID
+   * @param clientSecret Client Secret
+   * @return Access token
+   */
+  public String getAccessToken(String clientId, String clientSecret) {
 
-        String tokenUrl = KeycloakContainerInitializer.getKeycloakContainer().getAuthServerUrl()
-                + "/realms/customer/protocol/openid-connect/token";
+      String tokenUrl = KeycloakContainerInitializer.getKeycloakContainer().getAuthServerUrl()
+              + "/realms/customer/protocol/openid-connect/token";
 
-        RestTemplate restTemplate = new RestTemplate();
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+      RestTemplate restTemplate = new RestTemplate();
+      HttpHeaders headers = new HttpHeaders();
+      headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
-        MultiValueMap<String, String> form = new LinkedMultiValueMap<>();
-        form.add("client_id", clientId);
-        form.add("client_secret", clientSecret);
-        form.add("grant_type", "client_credentials");
+      MultiValueMap<String, String> form = new LinkedMultiValueMap<>();
+      form.add("client_id", clientId);
+      form.add("client_secret", clientSecret);
+      form.add("grant_type", "client_credentials");
 
-        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(form, headers);
-        ResponseEntity<Map> response = restTemplate.postForEntity(tokenUrl, request, Map.class);
+      HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(form, headers);
+      ResponseEntity<Map> response = restTemplate.postForEntity(tokenUrl, request, Map.class);
 
-        if (response.getStatusCode().is2xxSuccessful()) {
-            return (String) response.getBody().get("access_token");
-        } else {
-            throw new RuntimeException("Failed to obtain access token: " + response);
-        }
-    }
+      if (response.getStatusCode().is2xxSuccessful()) {
+          return (String) response.getBody().get("access_token");
+      } else {
+          throw new RuntimeException("Failed to obtain access token: " + response);
+      }
+  }
 
-    /**
-     * Get Keycloak client instance
-     * @return Keycloak client instance
-     */
-    private Keycloak keycloakClient(){
-        KeycloakContainer keycloakContainer = KeycloakContainerInitializer.getKeycloakContainer();
+  /**
+   * Get Keycloak client instance
+   * @return Keycloak client instance
+   */
+  private Keycloak keycloakClient(){
+      KeycloakContainer keycloakContainer = KeycloakContainerInitializer.getKeycloakContainer();
 
-        return Keycloak.getInstance(
-            keycloakContainer.getAuthServerUrl(),
-            "master",
-            keycloakProperties.getAdmin().getUsername(),
-            keycloakProperties.getAdmin().getPassword(),
-            "admin-cli");
-    }
+      return Keycloak.getInstance(
+          keycloakContainer.getAuthServerUrl(),
+          "master",
+          keycloakProperties.getAdmin().getUsername(),
+          keycloakProperties.getAdmin().getPassword(),
+          "admin-cli");
+  }
 ```
 
 ### 🚀 Final Test Class
 
-We have only one test where we generate Client-credentials access token and execute the REST Endpoint with valid access token
+We have only one test where we generate **client-credentials** access token and execute the REST Endpoint with valid access token
 
 ```
 @Test
@@ -231,6 +238,11 @@ void testProtectedEndpoint() {
 
 }
 ```
+
+### Final Conclusion
+This is just an example to demonstrate how to configure keycloak testcontainer, as per your project structure classes can be restructured.
+
+If you wants to know more about keycloak please refer this [keycloak Series](https://www.youtube.com/playlist?list=PLm2o_WHhxh2ioDeOdigAHPZ_SyOFpUygq)
 
 
 
